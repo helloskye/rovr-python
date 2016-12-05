@@ -3,6 +3,16 @@ from webapp2_extras import json
 import cgi
 import urllib
 import webapp2
+import users
+import login_required
+
+
+
+class Greet(webapp2.RequestHandler):
+    @login_required
+		def get(self):
+			user = users.get_current_user()
+			self.response.write("Hi, “ + user.email() + “!”)
 
 class DogWalker(ndb.Model):
     name = ndb.StringProperty()
