@@ -1,10 +1,12 @@
+import os
 from google.appengine.ext import ndb
 from webapp2_extras import json
 import cgi
 import urllib
 import webapp2
-import users
-import login_required
+import jinja2
+from google.appengine.ext.webapp.util import login_required
+from google.appengine.api import users
 
 JINJA_ENVIRONMENT = jinja2.Environment(
 	loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -12,10 +14,14 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True)
 
 class Greet(webapp2.RequestHandler):
-    @login_required
+	@login_required
 	def get(self):
-		user = users.get_current_user()
-		self.response.write("Hi, " + user.email() + "!")
+	     template = JINJA_ENVIRONMENT.get_template('index.html')
+	     user = users.get_current_user()
+	     params = {
+	          'nickname': user.nickname()
+	     }
+	     self.response.write(template.render(params))
 
 class DogWalker(ndb.Model):
     name = ndb.StringProperty()
@@ -93,4 +99,5 @@ app = webapp2.WSGIApplication([
     ('/create/request', CreateRequest),
     ('/delete/request', DeleteRequest),
     ('/get', GetAllData),
+	('/', Greet),
 ])
